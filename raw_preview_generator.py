@@ -58,13 +58,21 @@ def db_execute_with_retry(cursor, query, params=(), max_retries=5, delay=0.5):
 
 def parse_client_info(filepath):
     """Extract client name and date from filepath"""
-    # Pattern: YYYY-MM-DD ClientName
-    pattern = r'(\d{4}-\d{2}-\d{2})\s+([^\\\/]+)'
-    match = re.search(pattern, filepath)
+    # Pattern 1: YYYY-MM-DD ClientName (with client name)
+    pattern1 = r'(\d{4}-\d{2}-\d{2})\s+([^\\\/]+)'
+    match = re.search(pattern1, filepath)
     if match:
         date_str = match.group(1)
         client_name = match.group(2).strip()
         return client_name, date_str
+
+    # Pattern 2: YYYY-MM-DD (date only, no client name)
+    pattern2 = r'(\d{4}-\d{2}-\d{2})[\\/]'
+    match = re.search(pattern2, filepath)
+    if match:
+        date_str = match.group(1)
+        return None, date_str
+
     return None, None
 
 
