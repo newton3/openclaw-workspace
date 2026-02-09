@@ -117,7 +117,11 @@ def convert_raw_to_preview(raw_path, preview_path, max_size=1080, quality=85):
 
 
 def extract_exif_from_raw(raw_path):
-    """Extract EXIF metadata from RAW file"""
+    """Extract EXIF metadata from RAW file using ExifTool (preferred) or rawpy (fallback)"""
+    import subprocess
+    import json
+    import shutil
+
     metadata = {
         'camera_make': None,
         'camera_model': None,
@@ -131,6 +135,73 @@ def extract_exif_from_raw(raw_path):
         'gps_longitude': None,
     }
 
+    # Try ExifTool first (most comprehensive)
+    exiftool_path = shutil.which('exiftool')
+    if exiftool_path:
+        try:
+            # Call ExifTool to extract EXIF data as JSON
+            result = subprocess.run(
+                [exiftool_path, '-json', '-Make', '-Model', '-LensModel', '-ISO',
+                 '-FNumber', '-ExposureTime', '-FocalLength', '-DateTimeOriginal',
+                 '-GPSLatitude', '-GPSLongitude', raw_path],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+
+            if result.returncode == 0 and result.stdout:
+                data = json.loads(result.stdout)[0]
+
+                # Camera info
+                metadata['camera_make'] = data.get('Make')
+                metadata['camera_model'] = data.get('Model')
+                metadata['lens_model'] = data.get('LensModel')
+
+                # Exposure settings
+                metadata['iso'] = data.get('ISO')
+
+                # Aperture
+                if 'FNumber' in data:
+                    fn = data['FNumber']
+                    if isinstance(fn, (int, float)):
+                        metadata['aperture'] = f"f/{fn:.1f}"
+                    else:
+                        metadata['aperture'] = str(fn)
+
+                # Shutter speed
+                if 'ExposureTime' in data:
+                    exp_time = data['ExposureTime']
+                    if isinstance(exp_time, str) and '/' in exp_time:
+                        metadata['shutter_speed'] = exp_time
+                    elif isinstance(exp_time, (int, float)):
+                        if exp_time >= 1:
+                            metadata['shutter_speed'] = f"{exp_time:.1f}s"
+                        else:
+                            metadata['shutter_speed'] = f"1/{int(1/exp_time)}"
+
+                # Focal length
+                if 'FocalLength' in data:
+                    fl = data['FocalLength']
+                    if isinstance(fl, str):
+                        # Already formatted (e.g., "85.0 mm")
+                        metadata['focal_length'] = fl.replace(' mm', 'mm')
+                    else:
+                        metadata['focal_length'] = f"{fl:.0f}mm"
+
+                # Timestamp
+                if 'DateTimeOriginal' in data:
+                    metadata['datetime'] = data['DateTimeOriginal']
+
+                # GPS coordinates
+                metadata['gps_latitude'] = data.get('GPSLatitude')
+                metadata['gps_longitude'] = data.get('GPSLongitude')
+
+                return metadata
+
+        except Exception as e:
+            print(f"Warning: ExifTool failed, trying rawpy fallback: {e}")
+
+    # Fallback to rawpy if ExifTool not available or failed
     try:
         with rawpy.imread(raw_path) as raw:
             # Get metadata from RAW
@@ -163,7 +234,7 @@ def extract_exif_from_raw(raw_path):
                     metadata['datetime'] = datetime.fromtimestamp(raw.metadata.timestamp)
 
     except Exception as e:
-        print(f"Warning: Could not extract EXIF from {raw_path}: {e}")
+        pass  # Silently fail - already warned above
 
     return metadata
 
