@@ -90,29 +90,30 @@ If media send fails:
 
 ## Photo Search Database
 
-**IMPORTANT: To find photos, use the `photo-search-all` command via exec tool.**
+**CRITICAL: To find photos, ALWAYS use the `photo-search-all` command.**
+
+This command searches BOTH JPG and RAW databases automatically.
 
 ### Database Locations
 
 - **JPG Database**: `x:\openclaw\workspace\photos_full.db` - All exported JPG files
 - **RAW Database**: `x:\openclaw\workspace\raw_photos.db` - RAW files with instant-share previews
-- **Combined Search**: `photo-search-all` searches BOTH databases automatically
+- **photo-search-all**: Searches BOTH databases in a single command
 
 ### How to Search Photos
 
-**ALWAYS use exec tool with photo-search-all command (searches both JPG and RAW):**
+**When user asks for photos by DATE, use photo-search-all:**
 
-```json
-{
-  "tool": "exec",
-  "command": "photo-search-all",
-  "args": ["--date", "2025-02-07", "--limit", "10"]
-}
+Run this command:
+```
+photo-search-all --date "2025-02-07" --limit 10
 ```
 
-**This automatically searches:**
+This automatically searches:
 - Exported JPG files (from lr-clients-x folders)
-- RAW file previews (small JPGs perfect for sharing)
+- RAW file previews (small 100KB JPGs perfect for WhatsApp sharing)
+
+**IMPORTANT:** The command is already installed and ready to use. Just run it directly.
 
 ### Search Examples
 
@@ -170,31 +171,26 @@ photo-search-all --client "Arunita" --simple
 
 ### Common Use Cases
 
-**When user asks "find photos of Arunita" or "send pics from feb 7":**
-```bash
-photo-search-all --date "2025-02-07" --limit 20
+**When user asks "send pics from feb 7" or "photos from february 7":**
+Step 1: Search for photos
 ```
+photo-search-all --date "2025-02-07" --limit 10
+```
+Step 2: Use message tool to send the first result filepath
 
 **When user asks "show me photos from November 8":**
-```bash
+```
 photo-search-all --date "2025-11-08" --limit 20
 ```
 
-**When user asks "find photos taken with Canon/Sony camera":**
-```bash
+**When user asks "find photos taken with Canon camera":**
+```
 photo-search-all --camera "Canon" --limit 20
 ```
 
-**When user asks "find photos with location data":**
-```bash
-photo-search-all --location --limit 20
-```
-
-**When user asks for "previews" - search RAW database:**
-```bash
-photo-search-all --date "2025-02-07"
-```
-This returns RAW preview files (small ~100KB JPGs perfect for sharing)
+**When user asks for "previews":**
+The RAW previews are automatically included in all photo-search-all results.
+They are small (~100KB) JPG files perfect for WhatsApp sharing.
 
 **After finding photos, to send one:**
 Use the message tool with the filepath from search results:
