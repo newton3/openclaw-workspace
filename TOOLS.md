@@ -85,3 +85,123 @@ If media send fails:
 2. Ensure file size is under 50MB
 3. Check that the target is correct (group JID or phone number)
 4. Use the message tool directly - don't wrap in scripts
+
+---
+
+## Photo Search Database
+
+**IMPORTANT: To find photos, use the `photo-search` command via exec tool.**
+
+### Database Location
+
+- **Database**: `x:\openclaw\workspace\photos_full.db`
+- **Contains**: All JPG files from X: and U: drives with full metadata
+- **Indexed**: Client names, dates, camera info, GPS location, EXIF data
+
+### How to Search Photos
+
+**Use exec tool with photo-search command:**
+
+```json
+{
+  "tool": "exec",
+  "command": "photo-search",
+  "args": ["--client", "Arunita", "--limit", "10"]
+}
+```
+
+### Search Examples
+
+**Find by client name:**
+```bash
+photo-search "Arunita"
+photo-search --client "Arunita"
+```
+
+**Find by date:**
+```bash
+photo-search --date "2025-11-08"
+```
+
+**Find by camera:**
+```bash
+photo-search --camera "Sony"
+```
+
+**Find photos with GPS location:**
+```bash
+photo-search --location
+```
+
+**Combine multiple criteria:**
+```bash
+photo-search --client "Arunita" --date "2025-11-08" --limit 5
+```
+
+**Get just the count:**
+```bash
+photo-search --client "Arunita" --count
+```
+
+**Get file paths only (simple output):**
+```bash
+photo-search --client "Arunita" --simple
+```
+
+### Database Fields Available
+
+- `client_name` - Client name extracted from directory
+- `date` - Date in YYYY-MM-DD format
+- `camera_make` - Camera manufacturer (e.g., "Sony")
+- `camera_model` - Camera model (e.g., "ILCE-7RM5")
+- `lens_model` - Lens used
+- `iso` - ISO setting
+- `aperture` - Aperture (e.g., "f/2.8")
+- `shutter_speed` - Shutter speed (e.g., "1/250")
+- `focal_length` - Focal length (e.g., "85mm")
+- `gps_latitude` - GPS latitude
+- `gps_longitude` - GPS longitude
+- `folder_type` - Subfolder (e.g., "proof-70", "ps")
+- `size_mb` - File size in megabytes
+
+### Common Use Cases
+
+**When user asks "find photos of Arunita":**
+```bash
+photo-search --client "Arunita" --limit 20
+```
+
+**When user asks "show me photos from November 8":**
+```bash
+photo-search --date "2025-11-08" --limit 20
+```
+
+**When user asks "find photos taken with Sony camera":**
+```bash
+photo-search --camera "Sony" --limit 20
+```
+
+**When user asks "find photos with location data":**
+```bash
+photo-search --location --limit 20
+```
+
+**After finding photos, to send one:**
+Use the message tool with the filepath from search results:
+```json
+{
+  "action": "send",
+  "channel": "whatsapp",
+  "target": "120363405179913416@g.us",
+  "media": "X:\\data\\lr-clients-x\\2025-11-08 Arunita\\proof-70\\20251108-3X5A4267.jpg"
+}
+```
+
+### Important Notes
+
+- ✅ **DO** use `photo-search` via exec tool to find photos
+- ✅ **DO** use message tool to send found photos
+- ❌ **DON'T** try to search filesystem directly
+- ❌ **DON'T** write Python scripts to find files
+- The database is pre-indexed for fast searching
+- Results are limited to 50 by default (use --limit to change)
