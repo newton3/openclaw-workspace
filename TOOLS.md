@@ -92,7 +92,9 @@ If media send fails:
 
 **CRITICAL: To find photos, ALWAYS use the `photo-search-all` command.**
 
-This command searches BOTH JPG and RAW databases automatically.
+**DO NOT use photo_catalog.csv - it is outdated and incomplete.**
+
+The photo-search-all command searches BOTH JPG and RAW databases automatically.
 
 ### Database Locations
 
@@ -117,40 +119,24 @@ This automatically searches:
 
 ### Search Examples
 
-**Find by client name:**
-```bash
-photo-search-all "Arunita"
-photo-search-all --client "Arunita"
-```
-
 **Find by date (searches both JPG and RAW):**
 ```bash
-photo-search-all --date "2025-02-07"
+python "C:\Users\abhis\bin\photo-search-all.py" --date "2025-02-07"
+```
+
+**Find by client name:**
+```bash
+python "C:\Users\abhis\bin\photo-search-all.py" --client "Arunita"
 ```
 
 **Find by camera:**
 ```bash
-photo-search-all --camera "Canon"
-```
-
-**Find photos with GPS location:**
-```bash
-photo-search-all --location
-```
-
-**Combine multiple criteria:**
-```bash
-photo-search-all --client "Arunita" --date "2025-11-08" --limit 5
+python "C:\Users\abhis\bin\photo-search-all.py" --camera "Canon"
 ```
 
 **Get just the count:**
 ```bash
-photo-search-all --client "Arunita" --count
-```
-
-**Get file paths only (simple output):**
-```bash
-photo-search-all --client "Arunita" --simple
+python "C:\Users\abhis\bin\photo-search-all.py" --client "Arunita" --count
 ```
 
 ### Database Fields Available
@@ -174,7 +160,7 @@ photo-search-all --client "Arunita" --simple
 **When user asks "send pics from feb 7" or "photos from february 7":**
 Step 1: Search for photos
 ```
-photo-search-all --date "2025-02-07" --limit 10
+python "C:\Users\abhis\bin\photo-search-all.py" --date "2025-02-07" --limit 10
 ```
 Step 2: Use message tool to send the first result filepath
 
@@ -199,9 +185,12 @@ Use the message tool with the filepath from search results:
   "action": "send",
   "channel": "whatsapp",
   "target": "120363405179913416@g.us",
-  "media": "X:\\data\\lr-clients-x\\2025-11-08 Arunita\\proof-70\\20251108-3X5A4267.jpg"
+  "media": "X:\\data\\lr-clients-x\\2025-11-08 Arunita\\proof-70\\20251108-3X5A4267.jpg",
+  "message": "📸"
 }
 ```
+
+**IMPORTANT:** Always include a message parameter (can be just an emoji) when sending media.
 
 ### Important Notes
 
