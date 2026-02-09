@@ -1,0 +1,31 @@
+# SENSITIVE DATA - DO NOT COMMIT
+
+# Photo catalogs and databases - contain client names, dates, file paths
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+photo_catalog.csv
+photos.db
+photos_full.db
+
+# Any CSV catalogs
+*_catalog.csv
+catalog_*.csv
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
