@@ -90,62 +90,66 @@ If media send fails:
 
 ## Photo Search Database
 
-**IMPORTANT: To find photos, use the `photo-search` command via exec tool.**
+**IMPORTANT: To find photos, use the `photo-search-all` command via exec tool.**
 
-### Database Location
+### Database Locations
 
-- **Database**: `x:\openclaw\workspace\photos_full.db`
-- **Contains**: All JPG files from X: and U: drives with full metadata
-- **Indexed**: Client names, dates, camera info, GPS location, EXIF data
+- **JPG Database**: `x:\openclaw\workspace\photos_full.db` - All exported JPG files
+- **RAW Database**: `x:\openclaw\workspace\raw_photos.db` - RAW files with instant-share previews
+- **Combined Search**: `photo-search-all` searches BOTH databases automatically
 
 ### How to Search Photos
 
-**Use exec tool with photo-search command:**
+**ALWAYS use exec tool with photo-search-all command (searches both JPG and RAW):**
 
 ```json
 {
   "tool": "exec",
-  "command": "photo-search",
-  "args": ["--client", "Arunita", "--limit", "10"]
+  "command": "photo-search-all",
+  "args": ["--date", "2025-02-07", "--limit", "10"]
 }
 ```
+
+**This automatically searches:**
+- Exported JPG files (from lr-clients-x folders)
+- RAW file previews (small JPGs perfect for sharing)
 
 ### Search Examples
 
 **Find by client name:**
 ```bash
-photo-search "Arunita"
-photo-search --client "Arunita"
+photo-search-all "Arunita"
+photo-search-all --client "Arunita"
 ```
 
-**Find by date:**
+**Find by date (searches both JPG and RAW):**
 ```bash
-photo-search --date "2025-11-08"
+photo-search-all --date "2025-02-07"
 ```
 
 **Find by camera:**
 ```bash
-photo-search --camera "Sony"
+photo-search-all --camera "Canon"
 ```
 
 **Find photos with GPS location:**
 ```bash
-photo-search --location
+photo-search-all --location
 ```
 
 **Combine multiple criteria:**
 ```bash
-photo-search --client "Arunita" --date "2025-11-08" --limit 5
+photo-search-all --client "Arunita" --date "2025-11-08" --limit 5
 ```
 
 **Get just the count:**
 ```bash
-photo-search --client "Arunita" --count
+photo-search-all --client "Arunita" --count
 ```
 
 **Get file paths only (simple output):**
 ```bash
-photo-search --client "Arunita" --simple
+photo-search-all --client "Arunita" --simple
 ```
 
 ### Database Fields Available
@@ -166,25 +170,31 @@ photo-search --client "Arunita" --simple
 
 ### Common Use Cases
 
-**When user asks "find photos of Arunita":**
+**When user asks "find photos of Arunita" or "send pics from feb 7":**
 ```bash
-photo-search --client "Arunita" --limit 20
+photo-search-all --date "2025-02-07" --limit 20
 ```
 
 **When user asks "show me photos from November 8":**
 ```bash
-photo-search --date "2025-11-08" --limit 20
+photo-search-all --date "2025-11-08" --limit 20
 ```
 
-**When user asks "find photos taken with Sony camera":**
+**When user asks "find photos taken with Canon/Sony camera":**
 ```bash
-photo-search --camera "Sony" --limit 20
+photo-search-all --camera "Canon" --limit 20
 ```
 
 **When user asks "find photos with location data":**
 ```bash
-photo-search --location --limit 20
+photo-search-all --location --limit 20
 ```
+
+**When user asks for "previews" - search RAW database:**
+```bash
+photo-search-all --date "2025-02-07"
+```
+This returns RAW preview files (small ~100KB JPGs perfect for sharing)
 
 **After finding photos, to send one:**
 Use the message tool with the filepath from search results:
@@ -199,9 +209,11 @@ Use the message tool with the filepath from search results:
 
 ### Important Notes
 
-- ✅ **DO** use `photo-search` via exec tool to find photos
+- ✅ **DO** use `photo-search-all` via exec tool to find photos (searches both JPG and RAW)
 - ✅ **DO** use message tool to send found photos
+- ✅ **DO** search by date when user mentions dates (e.g., "feb 7" → --date "2025-02-07")
 - ❌ **DON'T** try to search filesystem directly
 - ❌ **DON'T** write Python scripts to find files
-- The database is pre-indexed for fast searching
+- Both databases are pre-indexed for fast searching
 - Results are limited to 50 by default (use --limit to change)
+- RAW previews are ~100KB (perfect for WhatsApp sharing)
